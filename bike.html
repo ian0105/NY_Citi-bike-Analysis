@@ -147,7 +147,7 @@
         }
 
 
-        d3.csv("201306-citibike-tripdata.csv")
+        d3.csv("https://raw.githubusercontent.com/ian0105/final_project/main/201306-citibike-tripdata.csv?token=GHSAT0AAAAAABUV2MCEFBXJHAFG4PXT5RBKYUEQ6HQ")
             .then(csvData => {
                 csvData.forEach(d => {
                     d["starttime"] = new Date(d["starttime"]).getDay();
@@ -155,6 +155,10 @@
                     d["start station name"] = d["start station name"];
                     d["end station name"] = d["end station name"];
                     d["birth year"] =  Math.floor((2013-d["birth year"])/10)*10;
+                    d["bikeid"] = d["bikeid"];
+                    d["usertype"] = d["usertype"];
+                    d["birth year"] = +d["birth year"];
+                    d["gender"] = d["gender"];
                 });
 
                 data = csvData;
