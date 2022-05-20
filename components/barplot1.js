@@ -48,7 +48,7 @@ class Barplot1 {
       }
       this.data_2 = data;
     let day2num = {'Sun':0,'Mon':1,'Tue':2,'Wed':3,'Thu':4,'Fri':5,'Sat':6};
-      const categories = [...new Set(data.map(d => d["starttime"]))]
+      var categories = [...new Set(data.map(d => d["starttime"]))]
       .sort(function (a, b) {
                             if (day2num[a] > day2num[b]) {
                                 return 1;
