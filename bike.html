@@ -50,6 +50,7 @@
       <div class="row pt-2">
           <div class="col-1 text-end pe-2"><strong>Start Station:</strong></div>
           <select id ="s-station" class="col-11">
+              <option value="ALL">ALL</option>
               <option value="W 20 St & 11 Ave">W 20 St & 11 Ave</option>
               <option value="E 17 St & Broadway">E 17 St & Broadway</option>
               <option value="Broadway & E 14 St">Broadway & E 14 St</option>
@@ -74,6 +75,7 @@
       <div class="row">
           <div class="col-1 text-end pe-2"><strong>End Station:</strong></div>
           <select id ="e-station" class="col-11">
+            <option value="ALL">ALL</option>
             <option value="W 20 St & 11 Ave">W 20 St & 11 Ave</option>
             <option value="E 17 St & Broadway">E 17 St & Broadway</option>
             <option value="Broadway & E 14 St">Broadway & E 14 St</option>
@@ -95,27 +97,29 @@
             <option value="E 24 St & Park Ave S">E 24 St & Park Ave S</option>
           </select>
       </div>
-        <div class="row">
-            <div class="col offset-1">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="use-color" checked>
-                    <label class="form-check-label" for="use-color">Color-encode Class</label>
-                </div>
-            </div>
-        </div>
         <div class="text-center">
             <svg width="400" height="400" id="barplot1">
+                <text x="-170" y="0" transform="rotate(-90) " alignment-baseline="hanging">Population</text>
             </svg>
 
             <svg width="400" height="400" id="barplot2">
+                  <text x="-200" y="0" transform="rotate(-90)" alignment-baseline="hanging">Boarding Time (s)</text>
             </svg>
+        </div>
+        <div class="row">
+            <div class="col offset-1">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="filter_NULL" checked>
+                    <label class="form-check-label" for="filter_NULL">Only Subscriber</label>
+                </div>
+            </div>
         </div>
         <table class="table table-striped text-center">
             <thead>
                 <tr>
-                    <th>Gender</th>
-                    <th>Birth / Year</th>
                     <th>Bike_Id</th>
+                    <th>Age Group</th>
+                    <th>Gender</th>
                     <th>Subscriber</th>
                 </tr>
             </thead>
@@ -143,24 +147,26 @@
         }
 
         function updateDataTable() {
-            dataTable.update(brushedData && brushedData.length > 0 ? brushedData : data, data.columns)
+            let useFilter = d3.select("#filter_NULL").property("checked");
+            //console.log(brushedData.length);
+            if (brushedData.length<20){
+            dataTable.update(brushedData && brushedData.length > 0? brushedData : data,useFilter);
+          }
         }
 
-
-        d3.csv("https://raw.githubusercontent.com/ian0105/final_project/main/201306-citibike-tripdata.csv?token=GHSAT0AAAAAABUV2MCEFBXJHAFG4PXT5RBKYUEQ6HQ")
+        let num2day = {0:'Sun',1:'Mon',2:'Tue',3:'Wed',4:'Thu',5:'Fri',6:'Sat'};
+        d3.csv("https://raw.githubusercontent.com/ian0105/final_project/main/201306-citibike-tripdata.csv")
             .then(csvData => {
                 csvData.forEach(d => {
-                    d["starttime"] = new Date(d["starttime"]).getDay();
+                    d["starttime"] = num2day[new Date(d["starttime"]).getDay()];
                     d["tripduration"] = +d["tripduration"];
                     d["start station name"] = d["start station name"];
                     d["end station name"] = d["end station name"];
                     d["birth year"] =  Math.floor((2013-d["birth year"])/10)*10;
                     d["bikeid"] = d["bikeid"];
-                    d["usertype"] = d["usertype"];
-                    d["birth year"] = +d["birth year"];
                     d["gender"] = d["gender"];
+                    d["usertype"] = d["usertype"];
                 });
-
                 data = csvData;
 
                 barplot1 = new Barplot1("#barplot1", data);
@@ -169,21 +175,22 @@
                 updateBarplot1();
                 d3.selectAll("[id =s-station]").on("change", updateBarplot1);
                 d3.selectAll("[id =e-station]").on("change", updateBarplot1);
-  //              d3.selectAll("#use-color").on("change", updateBarplot1);
 
-                // TODO: bind an event handler to "brush" events
                 barplot1.on("brush", (brushedItems) => {
                     brushedData = brushedItems;
+
                     updateBarplot2();
                     updateDataTable();
+
                 });
 
                 barplot2 = new Barplot2("#barplot2");
                 barplot2.initialize();
+                updateBarplot2();
 
 
                 dataTable = new DataTable("#data-table");
-
+                d3.selectAll("#filter_NULL").on("change", updateDataTable);
                 updateDataTable();
     })
     </script>

@@ -28,7 +28,7 @@ class Barplot2 {
 
     update(data, xVar) {
 
-        const categories = [...new Set(data.map(d => d[xVar]))].sort().slice(0,-1)
+        const categories = [...new Set(data.map(d => d[xVar]))].sort().filter(d => d<100)
         const average = list => list.reduce((prev, curr) => prev + curr) / list.length;
         const age = {}
         const average_ = {}
@@ -41,7 +41,7 @@ class Barplot2 {
         })
 
 
-        console.log(average_)
+        //console.log(average_)
 
         this.xScale.domain(categories).range([0, this.width]).padding(0.3);
         this.yScale.domain([0, d3.max(Object.values(average_))]).range([this.height, 0]);
@@ -54,7 +54,7 @@ class Barplot2 {
             .attr("y", d => this.yScale(average_[d]))
             .attr("width", this.xScale.bandwidth())
             .attr("height", d => this.height - this.yScale(average_[d]))
-            .attr("fill", "lightgray")
+            .attr("fill", "navy")
 
 
         this.xAxis

@@ -38,14 +38,32 @@ class Barplot1 {
     }
 
     update(sstation, estation) {
-      let data_1 = data.filter(d => d["start station name"]===sstation)
-      this.data_2 = data_1.filter(d => d["end station name"]===estation)
+      if (sstation != 'ALL'){
+      data = this.data.filter(d => d["start station name"]===sstation);
+    }else{
+      data = this.data;
+    }
+      if (estation != 'ALL'){
+      data = data.filter(d => d["end station name"]===estation);
+      }
+      this.data_2 = data;
+    let day2num = {'Sun':0,'Mon':1,'Tue':2,'Wed':3,'Thu':4,'Fri':5,'Sat':6};
+      const categories = [...new Set(data.map(d => d["starttime"]))]
+      .sort(function (a, b) {
+                            if (day2num[a] > day2num[b]) {
+                                return 1;
+                            }
+                            if (day2num[a] < day2num[b]) {
+                                return -1;
+                            }
+                            // a must be equal to b
+                            return 0;
+                            })
 
-      const categories = [...new Set(this.data_2.map(d => d["starttime"]))].sort()
       const counts = {}
 
       categories.forEach(c => {
-          counts[c] = this.data_2.filter(d => d["starttime"] === c).length;
+          counts[c] = data.filter(d => d["starttime"] === c).length;
       })
 
 
@@ -75,6 +93,8 @@ class Barplot1 {
           .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`)
           .call(d3.axisLeft(this.yScale));
     }
+
+
 
     isBrushed(d, selection) {
         let [[x0, y0], [x1, y1]] = selection; // destructuring assignment
